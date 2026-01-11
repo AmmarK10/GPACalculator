@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FAST-NUCES GPA Calculator</title>
+    <style>
+        :root {
+            --primary: #0056b3; 
+            --bg: #f4f7f6;
+            --white: #ffffff;
+            --text: #333;
+            --border: #ddd;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            background-color: var(--white);
+            width: 100%;
+            max-width: 800px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            margin-bottom: 30px;
+        }
+
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #777;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: var(--primary);
+        }
+
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.2s;
+        }
+
+        .btn-add { background-color: #28a745; color: white; }
+        .btn-add:hover { background-color: #218838; }
+
+        .btn-calc { background-color: var(--primary); color: white; }
+        .btn-calc:hover { background-color: #004494; }
+
+        .btn-clear { background-color: #dc3545; color: white; }
+        .btn-clear:hover { background-color: #c82333; }
+
+        .btn-remove {
+            background-color: #ffeba7;
+            color: #856404;
+            padding: 5px 10px;
+        }
+        
+        .result-box {
+            background-color: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+        }
+        
+        .result-box span {
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.5em;
+        }
+
+        .note {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 10px;
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>FAST-NUCES GPA Calculator</h1>
+
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('gpa')">Semester GPA</div>
+        <div class="tab" onclick="switchTab('cgpa')">CGPA Calculator</div>
+    </div>
+
+    <div id="gpa" class="section active">
+        <table id="courseTable">
+            <thead>
+                <tr>
+                    <th width="40%">Subject Name</th>
+                    <th width="25%">Marks (0-100)</th>
+                    <th width="25%">Credit Hours</th>
+                    <th width="10%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+
+        <div class="btn-group">
+            <button class="btn-add" onclick="addCourseRow()">+ Add Course</button>
+            <button class="btn-calc" onclick="calculateGPA()">Calculate GPA</button>
+            <button class="btn-clear" onclick="clearGPA()">Reset</button>
+        </div>
+
+        <div class="result-box" id="gpaResult" style="display:none;">
+            Your Semester GPA is: <span id="gpaValue">0.00</span>
+        </div>
+        
+        <div class="note">
+            <strong>Note:</strong> Uses Absolute Grading. Marks are rounded to the nearest integer (e.g., 69.9 &rarr; 70).
+        </div>
+    </div>
+
+    <div id="cgpa" class="section">
+        <div style="margin-bottom: 20px;">
+            <label>Current CGPA:</label>
+            <input type="number" id="currentCgpa" placeholder="e.g., 2.5" step="0.01">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label>Total Credit Hours Completed (Before this semester):</label>
+            <input type="number" id="completedCH" placeholder="e.g., 50">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label>New Semester GPA:</label>
+            <input type="number" id="newSemGpa" placeholder="e.g., 3.0" step="0.01">
+        </div>
+        <div style="margin-bottom: 20px;">
+            <label>New Semester Credit Hours:</label>
+            <input type="number" id="newSemCH" placeholder="e.g., 18">
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-calc" onclick="calculateCGPA()">Calculate CGPA</button>
+        </div>
+
+        <div class="result-box" id="cgpaResult" style="display:none;">
+            Your New CGPA is: <span id="cgpaValue">0.00</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- FAST Grading Policy (Absolute) ---
+    function getGradePoint(marks) {
+        
+        let rounded = Math.round(marks);
+
+        if (rounded >= 90) return 4.00; // A+
+        if (rounded >= 86) return 4.00; // A
+        if (rounded >= 82) return 3.67; // A-
+        if (rounded >= 78) return 3.33; // B+
+        if (rounded >= 74) return 3.00; // B
+        if (rounded >= 70) return 2.67; // B-
+        if (rounded >= 66) return 2.33; // C+
+        if (rounded >= 62) return 2.00; // C
+        if (rounded >= 58) return 1.67; // C-
+        if (rounded >= 54) return 1.33; // D+
+        if (rounded >= 50) return 1.00; // D
+        return 0.00; // F
+    }
+
+  
+    window.onload = function() {
+        for(let i=0; i<5; i++) addCourseRow();
+    };
+
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+        
+        if(tabId === 'gpa') {
+            document.querySelector('.tab:nth-child(1)').classList.add('active');
+            document.getElementById('gpa').classList.add('active');
+        } else {
+            document.querySelector('.tab:nth-child(2)').classList.add('active');
+            document.getElementById('cgpa').classList.add('active');
+        }
+    }
+
+    function addCourseRow() {
+        const tbody = document.querySelector('#courseTable tbody');
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><input type="text" placeholder="Subject (Optional)"></td>
+            <td><input type="number" class="marks" placeholder="0" min="0" max="100" step="0.01"></td>
+            <td><input type="number" class="ch" placeholder="3" min="1" max="6"></td>
+            <td><button class="btn-remove" onclick="removeRow(this)">✕</button></td>
+        `;
+        tbody.appendChild(row);
+    }
+
+    function removeRow(btn) {
+        const row = btn.parentNode.parentNode;
+        row.parentNode.removeChild(row);
+    }
+
+    function calculateGPA() {
+        let totalPoints = 0;
+        let totalCH = 0;
+        
+        const rows = document.querySelectorAll('#courseTable tbody tr');
+
+        rows.forEach(row => {
+            const marksInput = row.querySelector('.marks').value;
+            const chInput = row.querySelector('.ch').value;
+
+            if (marksInput !== "" && chInput !== "") {
+                const marks = parseFloat(marksInput);
+                const ch = parseFloat(chInput);
+
+                const points = getGradePoint(marks);
+                totalPoints += (points * ch);
+                totalCH += ch;
+            }
+        });
+
+        if (totalCH === 0) {
+            alert("Please enter marks and credit hours.");
+            return;
+        }
+
+        const gpa = totalPoints / totalCH;
+        document.getElementById('gpaValue').innerText = gpa.toFixed(2);
+        document.getElementById('gpaResult').style.display = 'block';
+    }
+
+    function clearGPA() {
+        document.querySelectorAll('#courseTable input').forEach(input => input.value = '');
+        document.getElementById('gpaResult').style.display = 'none';
+    }
+
+    function calculateCGPA() {
+        const currCGPA = parseFloat(document.getElementById('currentCgpa').value);
+        const compCH = parseFloat(document.getElementById('completedCH').value);
+        const semGPA = parseFloat(document.getElementById('newSemGpa').value);
+        const semCH = parseFloat(document.getElementById('newSemCH').value);
+
+        if (isNaN(currCGPA) || isNaN(compCH) || isNaN(semGPA) || isNaN(semCH)) {
+            alert("Please fill in all fields correctly.");
+            return;
+        }
+
+        const oldQualityPoints = currCGPA * compCH;
+        const newQualityPoints = semGPA * semCH;
+        
+        const totalQualityPoints = oldQualityPoints + newQualityPoints;
+        const totalCreditHours = compCH + semCH;
+
+        const finalCGPA = totalQualityPoints / totalCreditHours;
+
+        document.getElementById('cgpaValue').innerText = finalCGPA.toFixed(2);
+        document.getElementById('cgpaResult').style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
